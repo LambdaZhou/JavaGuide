@@ -31,7 +31,6 @@ Java 虚拟机在执行 Java 程序的过程中会把它管理的内存划分成
 <div align="center">  
 <img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-3Java运行时数据区域JDK1.8.png" width="600px"/>
 </div>
-
 **线程私有的：**
 
 - 程序计数器
@@ -202,9 +201,9 @@ JDK1.4 中新加入的 **NIO(New Input/Output) 类**，引入了一种基于**�
 **1 String 对象的两种创建方式：**
 
 ```java
-     String str1 = "abcd";
-     String str2 = new String("abcd");
-     System.out.println(str1==str2);//false
+String str1 = "abcd";
+String str2 = new String("abcd");
+System.out.println(str1==str2);//false
 ```
 
 这两种不同的创建方法是有差别的，第一种方式是在常量池中拿对象，第二种方式是直接在堆内存空间创建一个新的对象。
@@ -219,24 +218,24 @@ JDK1.4 中新加入的 **NIO(New Input/Output) 类**，引入了一种基于**�
 - 如果不是用双引号声明的 String 对象，可以使用 String 提供的 intern 方法。String.intern() 是一个 Native 方法，它的作用是：如果运行时常量池中已经包含一个等于此 String 对象内容的字符串，则返回常量池中该字符串的引用；如果没有，则在常量池中创建与此 String 内容相同的字符串，并返回常量池中创建的字符串的引用。
 
 ```java
-	      String s1 = new String("计算机");
-	      String s2 = s1.intern();
-	      String s3 = "计算机";
-	      System.out.println(s2);//计算机
-	      System.out.println(s1 == s2);//false，因为一个是堆内存中的String对象一个是常量池中的String对象，
-	      System.out.println(s3 == s2);//true，因为两个都是常量池中的String对象
+String s1 = new String("计算机");
+String s2 = s1.intern();
+String s3 = "计算机";
+System.out.println(s2);//计算机
+System.out.println(s1 == s2);//false，因为一个是堆内存中的String对象一个是常量池中的String对象，
+System.out.println(s3 == s2);//true，因为两个都是常量池中的String对象
 ```
 **3 String 字符串拼接**
 ```java
-		  String str1 = "str";
-		  String str2 = "ing";
-		  
-		  String str3 = "str" + "ing";//常量池中的对象
-		  String str4 = str1 + str2; //在堆上创建的新的对象	  
-		  String str5 = "string";//常量池中的对象
-		  System.out.println(str3 == str4);//false
-		  System.out.println(str3 == str5);//true
-		  System.out.println(str4 == str5);//false
+String str1 = "str";
+String str2 = "ing";
+
+String str3 = "str" + "ing";//常量池中的对象
+String str4 = str1 + str2; //在堆上创建的新的对象	  
+String str5 = "string";//常量池中的对象
+System.out.println(str3 == str4);//false
+System.out.println(str3 == str5);//true
+System.out.println(str4 == str5);//false
 ```
 ![](https://user-gold-cdn.xitu.io/2018/8/22/16561e59a4d13f92?w=593&h=603&f=png&s=22265)
 
@@ -248,10 +247,10 @@ JDK1.4 中新加入的 **NIO(New Input/Output) 类**，引入了一种基于**�
 **验证：**
 
 ```java
-		String s1 = new String("abc");// 堆内存的地址值
-		String s2 = "abc";
-		System.out.println(s1 == s2);// 输出false,因为一个是堆内存，一个是常量池的内存，故两者是不同的。
-		System.out.println(s1.equals(s2));// 输出true
+String s1 = new String("abc");// 堆内存的地址值
+String s2 = "abc";
+System.out.println(s1 == s2);// 输出false,因为一个是堆内存，一个是常量池的内存，故两者是不同的。
+System.out.println(s1.equals(s2));// 输出true
 ```
 
 **结果：**
@@ -271,56 +270,55 @@ true
 - **两种浮点数类型的包装类 Float,Double 并没有实现常量池技术。**
 
 ```java
-		Integer i1 = 33;
-		Integer i2 = 33;
-		System.out.println(i1 == i2);// 输出true
-		Integer i11 = 333;
-		Integer i22 = 333;
-		System.out.println(i11 == i22);// 输出false
-		Double i3 = 1.2;
-		Double i4 = 1.2;
-		System.out.println(i3 == i4);// 输出false
+Integer i1 = 33;
+Integer i2 = 33;
+System.out.println(i1 == i2);// 输出true
+Integer i11 = 333;
+Integer i22 = 333;
+System.out.println(i11 == i22);// 输出false
+Double i3 = 1.2;
+Double i4 = 1.2;
+System.out.println(i3 == i4);// 输出false
 ```
 
 **Integer 缓存源代码：** 
 
 ```java
 /**
-*此方法将始终缓存-128到127（包括端点）范围内的值，并可以缓存此范围之外的其他值。
+* 此方法将始终缓存-128到127（包括端点）范围内的值，并可以缓存此范围之外的其他值。
 */
-    public static Integer valueOf(int i) {
-        if (i >= IntegerCache.low && i <= IntegerCache.high)
-            return IntegerCache.cache[i + (-IntegerCache.low)];
-        return new Integer(i);
-    }
-
+public static Integer valueOf(int i) {
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
 ```
 
 **应用场景：**
-1. Integer i1=40；Java 在编译的时候会直接将代码封装成Integer i1=Integer.valueOf(40);，从而使用常量池中的对象。
-2.  Integer i1 = new Integer(40);这种情况下会创建新的对象。
+1. Integer i1 = 40；Java 在编译的时候会直接将代码封装成Integer i1 = Integer.valueOf(40); 从而使用常量池中的对象。
+2.  Integer i1 = new Integer(40); 这种情况下会创建新的对象。
 
 ```java
-  Integer i1 = 40;
-  Integer i2 = new Integer(40);
-  System.out.println(i1==i2);//输出false
+Integer i1 = 40;
+Integer i2 = new Integer(40);
+System.out.println(i1 == i2);//输出false
 ```
 **Integer比较更丰富的一个例子:**
 
 ```java
-  Integer i1 = 40;
-  Integer i2 = 40;
-  Integer i3 = 0;
-  Integer i4 = new Integer(40);
-  Integer i5 = new Integer(40);
-  Integer i6 = new Integer(0);
-  
-  System.out.println("i1=i2   " + (i1 == i2));
-  System.out.println("i1=i2+i3   " + (i1 == i2 + i3));
-  System.out.println("i1=i4   " + (i1 == i4));
-  System.out.println("i4=i5   " + (i4 == i5));
-  System.out.println("i4=i5+i6   " + (i4 == i5 + i6));   
-  System.out.println("40=i5+i6   " + (40 == i5 + i6));     
+Integer i1 = 40;
+Integer i2 = 40;
+Integer i3 = 0;
+Integer i4 = new Integer(40);
+Integer i5 = new Integer(40);
+Integer i6 = new Integer(0);
+
+System.out.println("i1=i2   " + (i1 == i2));
+System.out.println("i1=i2+i3   " + (i1 == i2 + i3));
+System.out.println("i1=i4   " + (i1 == i4));
+System.out.println("i4=i5   " + (i4 == i5));
+System.out.println("i4=i5+i6   " + (i4 == i5 + i6));   
+System.out.println("40=i5+i6   " + (40 == i5 + i6));     
 ```
 
 结果：
@@ -336,7 +334,7 @@ i4=i5+i6   true
 
 解释：
 
-语句i4 == i5 + i6，因为+这个操作符不适用于Integer对象，首先i5和i6进行自动拆箱操作，进行数值相加，即i4 == 40。然后Integer对象无法与数值进行直接比较，所以i4自动拆箱转为int值40，最终这条语句转为40 == 40进行数值比较。
+语句i4 == i5 + i6，因为 + 这个操作符不适用于Integer对象，首先i5和i6进行自动拆箱操作，进行数值相加，即i4 == 40。然后Integer对象无法与数值进行直接比较，所以i4自动拆箱转为int值40，最终这条语句转为40 == 40进行数值比较。
 
 ## 参考
 

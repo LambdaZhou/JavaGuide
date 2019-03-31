@@ -48,8 +48,7 @@ uniqueInstance 采用 volatile 关键字修饰也是很有必要的， uniqueIns
 
 但是由于 JVM 具有指令重排的特性，执行顺序有可能变成 1->3->2。指令重排在单线程环境下不会出先问题，但是在多线程环境下会导致一个线程获得还没有初始化的实例。例如，线程 T1 执行了 1 和 3，此时 T2 调用 getUniqueInstance() 后发现 uniqueInstance 不为空，因此返回 uniqueInstance，但此时 uniqueInstance 还未被初始化。
 
-使用 volatile 可以禁止 JVM 的指令重排，保证在多线程环境下也能正常运行。
-
+**使用 volatile 可以禁止 JVM 的指令重排，保证在多线程环境下也能正常运行。**
 
 ###synchronized 关键字底层原理总结
 
@@ -62,12 +61,12 @@ uniqueInstance 采用 volatile 关键字修饰也是很有必要的， uniqueIns
 ```java
 public class SynchronizedDemo {
 	public void method() {
+        //synchronized同步语句块
 		synchronized (this) {
 			System.out.println("synchronized 代码块");
 		}
 	}
 }
-
 ```
 
 通过 JDK 自带的 javap 命令查看 SynchronizedDemo 类的相关字节码信息：首先切换到类的对应目录执行 `javac SynchronizedDemo.java` 命令生成编译后的 .class 文件，然后执行`javap -c -s -v -l SynchronizedDemo.class`。
@@ -82,11 +81,11 @@ public class SynchronizedDemo {
 
 ```java
 public class SynchronizedDemo2 {
+    //synchronized方法
 	public synchronized void method() {
 		System.out.println("synchronized 方法");
 	}
 }
-
 ```
 
 ![synchronized 关键字原理](https://images.gitbook.cn/7d407bf0-d21e-11e8-b2d6-1188c7e0dd7e)

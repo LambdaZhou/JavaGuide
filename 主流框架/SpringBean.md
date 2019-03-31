@@ -96,7 +96,8 @@ Spring Bean是Spring应用中最最重要的部分了。所以来看看Spring容
 > spring版本：4.2.3.RELEASE
 鉴于Spring源码是用gradle构建的，我也决定舍弃我大maven，尝试下洪菊推荐过的gradle。运行beanLifeCycle模块下的junit test即可在控制台看到如下输出，可以清楚了解Spring容器在创建，初始化和销毁Bean的时候依次做了那些事情。
 
-```
+```java
+/*
 Spring容器初始化
 =====================================
 调用GiraffeService无参构造函数
@@ -122,6 +123,7 @@ giraffe Name=李光洙
 执行DisposableBean接口的destroy方法
 执行配置的destroy-method
 Spring容器关闭
+*/
 ```
 
 先来看看，Spring在Bean从创建到销毁的生命周期中可能做得事情。
@@ -172,7 +174,7 @@ public class GiraffeService {
 
 配置文件中的配置：
 
-```
+```xml
 <bean name="giraffeService" class="com.giraffe.spring.service.GiraffeService" init-method="initMethod" destroy-method="destroyMethod">
 </bean>
 ```
@@ -225,9 +227,9 @@ public class GiraffeService {
 
 ```java
 public class GiraffeService implements   ApplicationContextAware,
-        ApplicationEventPublisherAware, BeanClassLoaderAware, BeanFactoryAware,
-        BeanNameAware, EnvironmentAware, ImportAware, ResourceLoaderAware{
-         @Override
+	ApplicationEventPublisherAware, BeanClassLoaderAware, BeanFactoryAware,
+	BeanNameAware, EnvironmentAware, ImportAware, ResourceLoaderAware{
+    @Override
     public void setBeanClassLoader(ClassLoader classLoader) {
         System.out.println("执行setBeanClassLoader,ClassLoader Name = " + classLoader.getClass().getName());
     }
@@ -238,12 +240,12 @@ public class GiraffeService implements   ApplicationContextAware,
     @Override
     public void setBeanName(String s) {
         System.out.println("执行setBeanName:: Bean Name defined in context="
-                + s);
+                           + s);
     }
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         System.out.println("执行setApplicationContext:: Bean Definition Names="
-                + Arrays.toString(applicationContext.getBeanDefinitionNames()));
+                           + Arrays.toString(applicationContext.getBeanDefinitionNames()));
     }
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -257,7 +259,7 @@ public class GiraffeService implements   ApplicationContextAware,
     public void setResourceLoader(ResourceLoader resourceLoader) {
         Resource resource = resourceLoader.getResource("classpath:spring-beans.xml");
         System.out.println("执行setResourceLoader:: Resource File Name="
-                + resource.getFilename());
+                           + resource.getFilename());
     }
     @Override
     public void setImportMetadata(AnnotationMetadata annotationMetadata) {

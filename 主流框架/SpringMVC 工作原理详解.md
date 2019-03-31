@@ -19,7 +19,6 @@ SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给�
 需要在 web.xml 中配置 DispatcherServlet 。并且需要配置 Spring 监听器ContextLoaderListener
 
 ```xml
-
 <listener>
 	<listener-class>org.springframework.web.context.ContextLoaderListener
 	</listener-class>
@@ -39,7 +38,6 @@ SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给�
 	<servlet-name>springmvc</servlet-name>
 	<url-pattern>/</url-pattern>
 </servlet-mapping>
-
 ```
 
 ### SpringMVC 工作原理（重要）
