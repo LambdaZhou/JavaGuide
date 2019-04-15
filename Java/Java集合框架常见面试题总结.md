@@ -224,7 +224,7 @@ class Person implements Comparable<Person> {
 ## <font face="楷体">如何对Object的list排序</font>
 -   对objects数组进行排序，我们可以用Arrays.sort()方法
 -   对objects的集合进行排序，需要使用Collections.sort()方法
-  
+
 
 ## <font face="楷体">如何实现数组与List的相互转换</font>
 List转数组：toArray(arraylist.size()方法；数组转List:Arrays的asList(a)方法
@@ -316,7 +316,7 @@ public class MethodDemo {
 
 ## <font face="楷体">集合框架底层数据结构总结</font>
 ### - Collection
-  
+
 ####  1. List
    - Arraylist：数组（查询快,增删慢   线程不安全,效率高  ）
    - Vector：数组（查询快,增删慢 线程安全,效率低  ）
@@ -332,7 +332,7 @@ public class MethodDemo {
  -  LinkedHashMap:HashMap  的基础上加上了链表数据结构
  -  HashTable:哈希表
  -  TreeMap:红黑树（自平衡的排序二叉树）
- 
+
 
 ## <font face="楷体">集合的选用</font>
 主要根据集合的特点来选用，比如我们需要根据键值获取到元素值时就选用Map接口下的集合，需要排序时选择TreeMap,不需要排序时就选择HashMap,需要保证线程安全就选用ConcurrentHashMap.当我们只需要存放元素值时，就选择实现Collection接口的集合，需要保证元素唯一时选择实现Set接口的集合比如TreeSet或HashSet，不需要就选择实现List接口的比如ArrayList或LinkedList，然后再根据实现这些接口的集合的特点来选用。
@@ -348,6 +348,6 @@ public class MethodDemo {
 《Head first java 》第二版 推荐阅读真心不错 （适合基础较差的）
 
  《Java核心技术卷1》推荐阅读真心不错 （适合基础较好的）
- 
+
  《算法》第四版 （适合想对数据结构的Java实现感兴趣的）
- 
+
