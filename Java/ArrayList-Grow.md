@@ -67,7 +67,7 @@
      * 将指定的元素追加到此列表的末尾。 
      */
     public boolean add(E e) {
-   //添加元素之前，先调用ensureCapacityInternal方法
+   		//添加元素之前，先调用ensureCapacityInternal方法
         ensureCapacityInternal(size + 1);  // Increments modCount!!
         //这里看到ArrayList添加元素的实质就相当于为数组赋值
         elementData[size++] = e;

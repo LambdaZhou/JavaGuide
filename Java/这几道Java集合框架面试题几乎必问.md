@@ -44,14 +44,14 @@ public interface RandomAccess {
 在binarySearch（）方法中，它要判断传入的list 是否RamdomAccess的实例，如果是，调用indexedBinarySearch（）方法，如果不是，那么调用iteratorBinarySearch（）方法
 
 ```java
-    public static <T>
+public static <T>
     int binarySearch(List<? extends Comparable<? super T>> list, T key) {
         if (list instanceof RandomAccess || list.size()<BINARYSEARCH_THRESHOLD)
             return Collections.indexedBinarySearch(list, key);
         else
             return Collections.iteratorBinarySearch(list, key);
     }
-
+}
 ```
 ArrayList 实现了 RandomAccess 接口， 而 LinkedList 没有实现。为什么呢？我觉得还是和底层数据结构有关！ArrayList 底层是数组，而 LinkedList 底层是链表。数组天然支持随机访问，时间复杂度为 O（1），所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O（n），所以不支持快速随机访问。，ArrayList 实现了 RandomAccess 接口，就表明了他具有快速随机访问功能。 RandomAccess 接口只是标识，并不是说 ArrayList 实现 RandomAccess 接口才具有快速随机访问功能的！
 
@@ -89,13 +89,13 @@ JDK1.8 之前 HashMap 底层是 **数组和链表** 结合在一起使用也就�
 JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是原理不变。
 
   ```java
-      static final int hash(Object key) {
-        int h;
-        // key.hashCode()：返回散列值也就是hashcode
-        // ^ ：按位异或
-        // >>>:无符号右移，忽略符号位，空位都以0补齐
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
+static final int hash(Object key) {
+    int h;
+    // key.hashCode()：返回散列值也就是hashcode
+    // ^ ：按位异或
+    // >>>:无符号右移，忽略符号位，空位都以0补齐
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+}
   ```
 对比一下 JDK1.7的 HashMap 的 hash 方法源码.
 
@@ -141,38 +141,38 @@ static int hash(int h) {
 **HasMap 中带有初始容量的构造函数：**
 
 ```java
-    public HashMap(int initialCapacity, float loadFactor) {
-        if (initialCapacity < 0)
-            throw new IllegalArgumentException("Illegal initial capacity: " +
-                                               initialCapacity);
-        if (initialCapacity > MAXIMUM_CAPACITY)
-            initialCapacity = MAXIMUM_CAPACITY;
-        if (loadFactor <= 0 || Float.isNaN(loadFactor))
-            throw new IllegalArgumentException("Illegal load factor: " +
-                                               loadFactor);
-        this.loadFactor = loadFactor;
-        this.threshold = tableSizeFor(initialCapacity);
-    }
-     public HashMap(int initialCapacity) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR);
-    }
+public HashMap(int initialCapacity, float loadFactor) {
+    if (initialCapacity < 0)
+        throw new IllegalArgumentException("Illegal initial capacity: " +
+                                           initialCapacity);
+    if (initialCapacity > MAXIMUM_CAPACITY)
+        initialCapacity = MAXIMUM_CAPACITY;
+    if (loadFactor <= 0 || Float.isNaN(loadFactor))
+        throw new IllegalArgumentException("Illegal load factor: " +
+                                           loadFactor);
+    this.loadFactor = loadFactor;
+    this.threshold = tableSizeFor(initialCapacity);
+}
+public HashMap(int initialCapacity) {
+    this(initialCapacity, DEFAULT_LOAD_FACTOR);
+}
 ```
 
 下面这个方法保证了 HashMap 总是使用2的幂作为哈希表的大小。
 
 ```java
-    /**
-     * Returns a power of two size for the given target capacity.
-     */
-    static final int tableSizeFor(int cap) {
-        int n = cap - 1;
-        n |= n >>> 1;
-        n |= n >>> 2;
-        n |= n >>> 4;
-        n |= n >>> 8;
-        n |= n >>> 16;
-        return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
-    }
+/**
+* Returns a power of two size for the given target capacity.
+*/
+static final int tableSizeFor(int cap) {
+    int n = cap - 1;
+    n |= n >>> 1;
+    n |= n >>> 2;
+    n |= n >>> 4;
+    n |= n >>> 8;
+    n |= n >>> 16;
+    return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+}
 ```
 
 ## HashMap 的长度为什么是2的幂次方
@@ -199,7 +199,7 @@ static int hash(int h) {
 线程一：继续执行
 
 ![](https://note.youdao.com/yws/public/resource/e4cec65883d9fdc24effba57dcfa5241/xmlnote/79424b2bf4a89902a9e85c64600268e4/193)
- 
+
 这个过程为，先将 A 复制到新的 hash 表中，然后接着复制 B 到链头（A 的前边：B.next=A），本来 B.next=null，到此也就结束了（跟线程二一样的过程），但是，由于线程二扩容的原因，将 B.next=A，所以，这里继续复制A，让 A.next=B，由此，环形链表出现：B.next=A; A.next=B 
 
 **注意：jdk1.8已经解决了死循环的问题。**详细信息请阅读[jdk1.8 hashmap多线程put不会造成死循环](https://blog.csdn.net/qq_27007251/article/details/71403647)
@@ -258,12 +258,12 @@ synchronized只锁定当前链表或红黑二叉树的首节点，这样只要ha
 
 ## 集合框架底层数据结构总结
 ###  Collection
-  
+
 ####  1. List
    - **Arraylist：** Object数组
    - **Vector：** Object数组
    - **LinkedList：** 双向链表(JDK1.6之前为循环链表，JDK1.7取消了循环)
-   详细可阅读[JDK1.7-LinkedList循环链表优化](https://www.cnblogs.com/xingele0917/p/3696593.html)
+      详细可阅读[JDK1.7-LinkedList循环链表优化](https://www.cnblogs.com/xingele0917/p/3696593.html)
 
 ####  2. Set
   - **HashSet（无序，唯一）:**  基于 HashMap 实现的，底层采用 HashMap 来保存元素
@@ -275,7 +275,7 @@ synchronized只锁定当前链表或红黑二叉树的首节点，这样只要ha
  -  **LinkedHashMap:** LinkedHashMap 继承自 HashMap，所以它的底层仍然是基于拉链式散列结构即由数组和链表或红黑树组成。另外，LinkedHashMap 在上面结构的基础上，增加了一条双向链表，使得上面的结构可以保持键值对的插入顺序。同时通过对链表进行相应的操作，实现了访问顺序相关逻辑。详细可以查看：[《LinkedHashMap 源码详细分析（JDK1.8）》](https://www.imooc.com/article/22931)
  -  **HashTable:** 数组+链表组成的，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的
  -  **TreeMap:** 红黑树（自平衡的排序二叉树）
- 
+
 
 
 

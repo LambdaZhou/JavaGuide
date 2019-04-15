@@ -58,7 +58,7 @@ uniqueInstance 采用 volatile 关键字修饰也是很有必要的， uniqueIns
 
 但是由于 JVM 具有指令重排的特性，执行顺序有可能变成 1->3->2。指令重排在单线程环境下不会出先问题，但是在多线程环境下会导致一个线程获得还没有初始化的实例。例如，线程 T1 执行了 1 和 3，此时 T2 调用 getUniqueInstance() 后发现 uniqueInstance 不为空，因此返回 uniqueInstance，但此时 uniqueInstance 还未被初始化。
 
-使用 volatile 可以禁止 JVM 的指令重排，保证在多线程环境下也能正常运行。
+**使用 volatile 可以禁止 JVM 的指令重排，保证在多线程环境下也能正常运行**。
 
 ### 1.3 讲一下 synchronized 关键字的底层原理
 
@@ -181,9 +181,9 @@ synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团�
 ### 3.3 执行execute()方法和submit()方法的区别是什么呢？
 
   1)**`execute()` 方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功与否；**
-  
+
   2)**submit()方法用于提交需要返回值的任务。线程池会返回一个future类型的对象，通过这个future对象可以判断任务是否执行成功**，并且可以通过future的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，而使用 `get（long timeout，TimeUnit unit）`方法则会阻塞当前线程一段时间后立即返回，这时候有可能任务没有执行完。
-  
+
 
 ### 3.4 如何创建线程池
 
@@ -255,7 +255,7 @@ Atomic 翻译成中文是原子的意思。在化学上，我们知道原子是�
 ### 4.3 讲讲 AtomicInteger 的使用
 
  **AtomicInteger 类常用方法**
- 
+
 ```java
 public final int get() //获取当前的值
 public final int getAndSet(int newValue)//获取当前的值，并设置新的值
@@ -303,7 +303,7 @@ AtomicInteger 类的部分源码：
     }
 
     private volatile int value;
-``` 
+```
 
 AtomicInteger 类主要利用 CAS (compare and swap) + volatile 和 native 方法来保证原子操作，从而避免 synchronized 的高开销，执行效率大为提升。
 

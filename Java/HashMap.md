@@ -31,13 +31,13 @@ JDK1.8 之前 HashMap 底层是 **数组和链表** 结合在一起使用也就�
 JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是原理不变。
 
   ```java
-      static final int hash(Object key) {
-        int h;
-        // key.hashCode()：返回散列值也就是hashcode
-        // ^ ：按位异或
-        // >>>:无符号右移，忽略符号位，空位都以0补齐
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
+static final int hash(Object key) {
+    int h;
+    // key.hashCode()：返回散列值也就是hashcode
+    // ^ ：按位异或
+    // >>>:无符号右移，忽略符号位，空位都以0补齐
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+}
   ```
 对比一下 JDK1.7的 HashMap 的 hash 方法源码.
 
@@ -111,94 +111,95 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 ```java
 // 继承自 Map.Entry<K,V>
 static class Node<K,V> implements Map.Entry<K,V> {
-       final int hash;// 哈希值，存放元素到hashmap中时用来与其他元素hash值比较
-       final K key;//键
-       V value;//值
-       // 指向下一个节点
-       Node<K,V> next;
-       Node(int hash, K key, V value, Node<K,V> next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-        public final K getKey()        { return key; }
-        public final V getValue()      { return value; }
-        public final String toString() { return key + "=" + value; }
-        // 重写hashCode()方法
-        public final int hashCode() {
-            return Objects.hashCode(key) ^ Objects.hashCode(value);
-        }
+    final int hash;// 哈希值，存放元素到hashmap中时用来与其他元素hash值比较
+    final K key;//键
+    V value;//值
+    // 指向下一个节点
+    Node<K,V> next;
+    Node(int hash, K key, V value, Node<K,V> next) {
+        this.hash = hash;
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
+    public final K getKey()        { return key; }
+    public final V getValue()      { return value; }
+    public final String toString() { return key + "=" + value; }
+    // 重写hashCode()方法
+    public final int hashCode() {
+        return Objects.hashCode(key) ^ Objects.hashCode(value);
+    }
 
-        public final V setValue(V newValue) {
-            V oldValue = value;
-            value = newValue;
-            return oldValue;
-        }
-        // 重写 equals() 方法
-        public final boolean equals(Object o) {
-            if (o == this)
+    public final V setValue(V newValue) {
+        V oldValue = value;
+        value = newValue;
+        return oldValue;
+    }
+    // 重写 equals() 方法
+    public final boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (o instanceof Map.Entry) {
+            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+            if (Objects.equals(key, e.getKey()) &&
+                Objects.equals(value, e.getValue()))
                 return true;
-            if (o instanceof Map.Entry) {
-                Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-                if (Objects.equals(key, e.getKey()) &&
-                    Objects.equals(value, e.getValue()))
-                    return true;
-            }
-            return false;
         }
+        return false;
+    }
 }
 ```
 **树节点类源码:**
 ```java
 static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
-        TreeNode<K,V> parent;  // 父
-        TreeNode<K,V> left;    // 左
-        TreeNode<K,V> right;   // 右
-        TreeNode<K,V> prev;    // needed to unlink next upon deletion
-        boolean red;           // 判断颜色
-        TreeNode(int hash, K key, V val, Node<K,V> next) {
-            super(hash, key, val, next);
+    TreeNode<K,V> parent;  // 父
+    TreeNode<K,V> left;    // 左
+    TreeNode<K,V> right;   // 右
+    TreeNode<K,V> prev;    // needed to unlink next upon deletion
+    boolean red;           // 判断颜色
+    TreeNode(int hash, K key, V val, Node<K,V> next) {
+        super(hash, key, val, next);
+    }
+    // 返回根节点
+    final TreeNode<K,V> root() {
+        for (TreeNode<K,V> r = this, p;;) {
+            if ((p = r.parent) == null)
+                return r;
+            r = p;
         }
-        // 返回根节点
-        final TreeNode<K,V> root() {
-            for (TreeNode<K,V> r = this, p;;) {
-                if ((p = r.parent) == null)
-                    return r;
-                r = p;
-       }
+    }
 ```
 ## HashMap源码分析
 ### 构造方法
 ![四个构造方法](https://user-gold-cdn.xitu.io/2018/3/20/162410d912a2e0e1?w=336&h=90&f=jpeg&s=26744)
 ```java
-    // 默认构造函数。
-    public HashMap() {
-        this.loadFactor = DEFAULT_LOAD_FACTOR; // all   other fields defaulted
-     }
-     
-     // 包含另一个“Map”的构造函数
-     public HashMap(Map<? extends K, ? extends V> m) {
-         this.loadFactor = DEFAULT_LOAD_FACTOR;
-         putMapEntries(m, false);//下面会分析到这个方法
-     }
-     
-     // 指定“容量大小”的构造函数
-     public HashMap(int initialCapacity) {
-         this(initialCapacity, DEFAULT_LOAD_FACTOR);
-     }
-     
-     // 指定“容量大小”和“加载因子”的构造函数
-     public HashMap(int initialCapacity, float loadFactor) {
-         if (initialCapacity < 0)
-             throw new IllegalArgumentException("Illegal initial capacity: " + initialCapacity);
-         if (initialCapacity > MAXIMUM_CAPACITY)
-             initialCapacity = MAXIMUM_CAPACITY;
-         if (loadFactor <= 0 || Float.isNaN(loadFactor))
-             throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
-         this.loadFactor = loadFactor;
-         this.threshold = tableSizeFor(initialCapacity);
-     }
+// 默认构造函数。
+public HashMap() {
+    this.loadFactor = DEFAULT_LOAD_FACTOR; // all   other fields defaulted
+}
+
+// 包含另一个“Map”的构造函数
+public HashMap(Map<? extends K, ? extends V> m) {
+    this.loadFactor = DEFAULT_LOAD_FACTOR;
+    putMapEntries(m, false);//下面会分析到这个方法
+}
+
+// 指定“容量大小”的构造函数
+public HashMap(int initialCapacity) {
+    this(initialCapacity, DEFAULT_LOAD_FACTOR);
+}
+
+// 指定“容量大小”和“加载因子”的构造函数
+public HashMap(int initialCapacity, float loadFactor) {
+    if (initialCapacity < 0)
+        throw new IllegalArgumentException("Illegal initial capacity: " + initialCapacity);
+    if (initialCapacity > MAXIMUM_CAPACITY)
+        initialCapacity = MAXIMUM_CAPACITY;
+    if (loadFactor <= 0 || Float.isNaN(loadFactor))
+        throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
+    this.loadFactor = loadFactor;
+    this.threshold = tableSizeFor(initialCapacity);
+}
 ```
 
 **putMapEntries方法：**
@@ -212,7 +213,7 @@ final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
             // 未初始化，s为m的实际元素个数
             float ft = ((float)s / loadFactor) + 1.0F;
             int t = ((ft < (float)MAXIMUM_CAPACITY) ?
-                    (int)ft : MAXIMUM_CAPACITY);
+                     (int)ft : MAXIMUM_CAPACITY);
             // 计算得到的t大于阈值，则初始化阈值
             if (t > threshold)
                 threshold = tableSizeFor(t);
@@ -247,7 +248,7 @@ public V put(K key, V value) {
 }
 
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
+               boolean evict) {
     Node<K,V>[] tab; Node<K,V> p; int n, i;
     // table未初始化或者长度为0，进行扩容
     if ((tab = table) == null || (n = tab.length) == 0)
@@ -261,8 +262,8 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         // 比较桶中第一个元素(数组中的结点)的hash值相等，key相等
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))
-                // 将第一个元素赋值给e，用e来记录
-                e = p;
+            // 将第一个元素赋值给e，用e来记录
+            e = p;
         // hash值不相等，即key不相等；为红黑树结点
         else if (p instanceof TreeNode)
             // 放入树中
@@ -323,10 +324,10 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 - ②如果定位到的数组位置有元素，遍历以这个元素为头结点的链表，依次和插入的key比较，如果key相同就直接覆盖，不同就采用头插法插入元素。
 
 ```java
-public V put(K key, V value)
+public V put(K key, V value) {
     if (table == EMPTY_TABLE) { 
-    inflateTable(threshold); 
-}  
+        inflateTable(threshold); 
+    }  
     if (key == null)
         return putForNullKey(value);
     int hash = hash(key);
@@ -412,7 +413,7 @@ final Node<K,V>[] resize() {
     }
     threshold = newThr;
     @SuppressWarnings({"rawtypes","unchecked"})
-        Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
+    Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
     table = newTab;
     if (oldTab != null) {
         // 把每个bucket都移动到新的buckets中
@@ -520,7 +521,7 @@ public class HashMapDemo {
         for (java.util.Map.Entry<String, String> entry : entrys) {
             System.out.println(entry.getKey() + "--" + entry.getValue());
         }
-        
+
         /**
          * HashMap其他常用方法
          */
